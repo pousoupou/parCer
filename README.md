@@ -8,7 +8,9 @@ A simple txt parser written in C
 ./parcer [DELIMITER] [OPTIONS] [FILE] [FILE]
 
 ## Delimiter
-An ASCII character to delimit the text, enclosed in either "" or ''  
+An ASCII character to delimit the text
+- -d " " _or_ -d ' '
+will set the delimiter to SPACE  
 _if delimiter is not SPACE (ASCII code: 32), you can skip the marks_
 
 ## Options
