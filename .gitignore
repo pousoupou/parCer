@@ -54,3 +54,4 @@ dkms.conf
 # Input/Output test files
 *.txt
 test
+main
