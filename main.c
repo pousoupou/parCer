@@ -130,10 +130,9 @@ int main(int argc, char **argv){
             }
 
             char *_token = NULL;
-            _token = (char *)malloc(token_len * sizeof(char));
+            _token = (char *)malloc(token_len * sizeof(char) + 1);
 
             for(int i = 0; i < (token_len + 1); i++){
-                // FIXME: Invalid write of size 1
                 _token[i] = token[i];
             }
 
@@ -178,10 +177,9 @@ int main(int argc, char **argv){
     }
 
     char *_token = NULL;
-    _token = (char *)malloc(token_len * sizeof(char));
+    _token = (char *)malloc(token_len * sizeof(char) + 1);
 
     for(int i = 0; i < (token_len + 1); i++){
-        // FIXME: Invalid write of size 1
         _token[i] = token[i];
     }
 
