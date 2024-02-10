@@ -4,6 +4,7 @@
 #include <unistd.h>     // cmd arguments
 #include <stdlib.h>     // malloc n stuff
 #include <errno.h>      // errors
+#include <bits/getopt_core.h>   // just to use optarg in line 34
 
 #ifndef FALSE
     #define FALSE 0
@@ -71,17 +72,19 @@ int main(int argc, char **argv){
     char *token = NULL;
     token = (char *)malloc(token_len_max * sizeof(char));
 
+    int del_found = FALSE;
     int token_idx = 0;
     int token_len = 0;
     char character = getc(input);
 
     // FIXME: parse token on EOF
-    // FIXME: if delimiter is found 2 consecutive times, previous token is written again
     while(character != EOF){
         if(character == '\r'){
             character = getc(input);
             continue;
         } else if((character != delimiter) && (character != '\n')){
+            del_found = FALSE;
+
             token[token_idx++] = character;
             token_len = token_idx;
 
@@ -90,7 +93,12 @@ int main(int argc, char **argv){
                 token_len_max += token_len_max;
                 token = (char *)realloc(token, token_len_max * sizeof(char));
             }
+        } else if(del_found && character == delimiter){
+            character = getc(input);
+            continue;
         } else {
+            del_found = TRUE;
+            
             if(TRIM){
                 // TODO: turn this into a function
 
