@@ -87,6 +87,8 @@ int main(int argc, char **argv){
             load_factor = (float)token_idx / token_len_max;
             if(load_factor > load_factor_threshold){
                 token_len_max += token_len_max;
+
+                // FIXME: seg fault (gdb)
                 token = (char *)realloc(token, token_len_max * sizeof(char));
             }
         } else if(del_found && ((character == delimiter) || (character == '\n') || (character == '\r'))){
@@ -96,7 +98,7 @@ int main(int argc, char **argv){
         } else {
             del_found = TRUE;
             
-            
+            // TODO: trim multiple non-alphanumeric characters from token
             if(TRIM){
                 // TODO: turn this into a function
 
@@ -136,6 +138,7 @@ int main(int argc, char **argv){
             }
 
             // FIXME: Invalid read of size 1 (valgrind)
+            // possible seg fault generator
             // possible fix: terminate each token with \0
             fputs(_token, output);
 
