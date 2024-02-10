@@ -65,23 +65,20 @@ int main(int argc, char **argv){
         return 1;
     }
 
-    int token_len_max = 32;
-    float load_factor_threshold = 0.8;
-    float load_factor = 0;
+    int token_len_max = 32;             // arbitrary size
+    float load_factor_threshold = 0.8;  // arbitrary size
+    float load_factor = 0;              // initialize
 
     char *token = NULL;
     token = (char *)malloc(token_len_max * sizeof(char));
 
     int del_found = FALSE;
-    int token_idx = 0;
-    int token_len = 0;
-    char character = getc(input);
+    int token_idx = 0;              // token index
+    int token_len = 0;              // token length
+    char character = getc(input);   // current character
 
     while(character != EOF){
-        if(character == '\r'){
-            character = getc(input);
-            continue;
-        } else if((character != delimiter) && (character != '\n')){
+        if((character != delimiter) && (character != '\n') && (character != '\r')){
             del_found = FALSE;
 
             token[token_idx++] = character;
@@ -92,11 +89,13 @@ int main(int argc, char **argv){
                 token_len_max += token_len_max;
                 token = (char *)realloc(token, token_len_max * sizeof(char));
             }
-        } else if(del_found && character == delimiter){
+        } else if(del_found && ((character == delimiter) || (character == '\n') || (character == '\r'))){
             character = getc(input);
+            token_idx = 0;
             continue;
         } else {
             del_found = TRUE;
+            
             
             if(TRIM){
                 // TODO: turn this into a function
@@ -136,6 +135,8 @@ int main(int argc, char **argv){
                 _token[i] = token[i];
             }
 
+            // FIXME: Invalid read of size 1 (valgrind)
+            // possible fix: terminate each token with \0
             fputs(_token, output);
 
             free(_token);
@@ -145,47 +146,49 @@ int main(int argc, char **argv){
         character = getc(input);
     }
 
-    if(TRIM){
-        // TODO: turn this into a function
-
-        // example of a 5 character long token being fully trimmed
-        //--------------------------------------------------------
-        //  idx    len    idx    len    idx    len    idx    len
-        // 012345        012345        012345        012345
-        // (asd)_ : 5 -> _asd)_ : 4 -> asd)__ : 4 -> asd___ : 3
-
-        if(!isalnum(token[0])){
-            token[0] = '\0';
-
+    if(token_idx > 0){
+        if(TRIM){
             // TODO: turn this into a function
-            // allign string with the start of the array
-            for(int i = 0; i < token_len; i++){
-                token[i] = token[i+1];
-            }
 
-            token_len--;
+            // example of a 5 character long token being fully trimmed
+            //--------------------------------------------------------
+            //  idx    len    idx    len    idx    len    idx    len
+            // 012345        012345        012345        012345
+            // (asd)_ : 5 -> _asd)_ : 4 -> asd)__ : 4 -> asd___ : 3
+
+            if(!isalnum(token[0])){
+                token[0] = '\0';
+
+                // TODO: turn this into a function
+                // allign string with the start of the array
+                for(int i = 0; i < token_len; i++){
+                    token[i] = token[i+1];
+                }
+
+                token_len--;
+            }
+            if(!isalnum(token[token_len - 1])){
+                token[token_len - 1] = '\0';
+                token_len--;
+                }
         }
-        if(!isalnum(token[token_len - 1])){
-            token[token_len - 1] = '\0';
-            token_len--;
-            }
+        if(NEW_LINE){
+            token[token_len] = '\n';
+        } else {
+            token[token_len] = ' ';
+        }
+
+        char *_token = NULL;
+        _token = (char *)malloc(token_len * sizeof(char) + 1);
+
+        for(int i = 0; i < (token_len + 1); i++){
+            _token[i] = token[i];
+        }
+
+        fputs(_token, output);
+
+        free(_token);
     }
-    if(NEW_LINE){
-        token[token_len] = '\n';
-    } else {
-        token[token_len] = ' ';
-    }
-
-    char *_token = NULL;
-    _token = (char *)malloc(token_len * sizeof(char) + 1);
-
-    for(int i = 0; i < (token_len + 1); i++){
-        _token[i] = token[i];
-    }
-
-    fputs(_token, output);
-
-    free(_token);
 
     free(token);
     if(fclose(input) != 0){
