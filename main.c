@@ -77,7 +77,6 @@ int main(int argc, char **argv){
     int token_len = 0;
     char character = getc(input);
 
-    // FIXME: parse token on EOF
     while(character != EOF){
         if(character == '\r'){
             character = getc(input);
@@ -144,9 +143,51 @@ int main(int argc, char **argv){
 
             token_idx = 0;
         }
-
         character = getc(input);
     }
+
+    if(TRIM){
+        // TODO: turn this into a function
+
+        // example of a 5 character long token being fully trimmed
+        //--------------------------------------------------------
+        //  idx    len    idx    len    idx    len    idx    len
+        // 012345        012345        012345        012345
+        // (asd)_ : 5 -> _asd)_ : 4 -> asd)__ : 4 -> asd___ : 3
+
+        if(!isalnum(token[0])){
+            token[0] = '\0';
+
+            // TODO: turn this into a function
+            // allign string with the start of the array
+            for(int i = 0; i < token_len; i++){
+                token[i] = token[i+1];
+            }
+
+            token_len--;
+        }
+        if(!isalnum(token[token_len - 1])){
+            token[token_len - 1] = '\0';
+            token_len--;
+            }
+    }
+    if(NEW_LINE){
+        token[token_len] = '\n';
+    } else {
+        token[token_len] = ' ';
+    }
+
+    char *_token = NULL;
+    _token = (char *)malloc(token_len * sizeof(char));
+
+    for(int i = 0; i < (token_len + 1); i++){
+        // FIXME: Invalid write of size 1
+        _token[i] = token[i];
+    }
+
+    fputs(_token, output);
+
+    free(_token);
 
     free(token);
     if(fclose(input) != 0){
