@@ -15,7 +15,7 @@
 #endif
 
 int main(int argc, char **argv){
-    if(argc < 5){
+    if(argc < 6){
         printf("Usage: parCer [DELIMITER] [OPTION]... [FILE] [FILE]\n");
         return 1;
     }
@@ -57,6 +57,7 @@ int main(int argc, char **argv){
     FILE *output = NULL;
 
     if((input = fopen(argv[argc-2], "r")) == NULL){
+        printf("TEST\n");
         printf("wrong input file: %s\n", *argv[argc-2]);
         return 1;
     }
@@ -131,15 +132,14 @@ int main(int argc, char **argv){
             }
 
             char *_token = NULL;
-            _token = (char *)malloc(token_len * sizeof(char) + 1);
+            _token = (char *)malloc(token_len * sizeof(char) + 2); // +1 for space/newline, +1 for \0
 
             for(int i = 0; i < (token_len + 1); i++){
                 _token[i] = token[i];
             }
 
-            // FIXME: Invalid read of size 1 (valgrind)
-            // possible seg fault generator
-            // possible fix: terminate each token with \0
+            _token[token_len + 1] = '\0'; // terminate string
+
             fputs(_token, output);
 
             free(_token);
